@@ -1,0 +1,9 @@
+{
+    "name": "keboola/docker-test",
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/yaml": "~2.6.3"
+    }
+}
