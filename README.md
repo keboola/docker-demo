@@ -87,10 +87,10 @@ To be defined further, but you will have options to set:
 What happens before and after running a Docker container.
 
   - Download and build specified docker image
-  - Download all files/tables specified in input mapping
+  - Download all tables and files specified in input mapping
   - Create configurationi file
-  - Run image
-  - Upload all files in output mapping
+  - Run the container
+  - Upload all tables and files in output mapping
   - Delete image and all temporary files
 
 
