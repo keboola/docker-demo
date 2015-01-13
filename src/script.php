@@ -5,8 +5,8 @@ require_once(dirname(__FILE__) . "/../vendor/autoload.php");
 
 $config = Yaml::parse(file_get_contents(dirname(__FILE__) . "/../data/config.yml"));
 
-$sourceTable = $config["input"][0]["source"];
-$destinationTable = $config["output"][0]["destination"];;
+$sourceTable = $config["input"]["tables"][0]["source"];
+$destinationTable = $config["output"]["tables"][0]["destination"];;
 $primaryKeyColumn = $config["primary_key_column"];
 $dataColumn = $config["data_column"];
 $stringLength = $config["string_length"];
@@ -26,13 +26,13 @@ function mb_str_split($str, $l=0) {
     return preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY);
 }
 
-if (!file_exists(dirname(__FILE__) . "/../data/in/{$sourceTable}.csv")) {
-	print "File 'data/in/{$sourceTable}.csv' not found.";
+if (!file_exists(dirname(__FILE__) . "/../data/in/tables/{$sourceTable}.csv")) {
+	print "File 'data/in/tables/{$sourceTable}.csv' not found.";
 	exit(1);
 }
 
-$fhIn = fopen(dirname(__FILE__) . "/../data/in/{$sourceTable}.csv", "r");
-$fhOut = fopen(dirname(__FILE__) . "/../data/out/{$destinationTable}.csv", "w");
+$fhIn = fopen(dirname(__FILE__) . "/../data/in/tables/{$sourceTable}.csv", "r");
+$fhOut = fopen(dirname(__FILE__) . "/../data/out/tables/{$destinationTable}.csv", "w");
 
 $header = fgetcsv($fhIn, 10000);
 
