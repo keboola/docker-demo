@@ -306,13 +306,13 @@ Output files from `/data/out/files` folder are automatically uploaded to file up
 
 These manifest parameters can be used (taken from [Storage API File Import](http://docs.keboola.apiary.io/#files)):
 
- - name (if not set, will use the filename)
- - contentType 
- - isPublic
- - isPermanent
- - notify
- - tags
- - isEncrypted
+ - `name` (if not set, will use the filename)
+ - `contentType`
+ - `isPublic`
+ - `isPermanent`
+ - `notify`
+ - `tags`
+ - `isEncrypted`
 
 #####Example
 
