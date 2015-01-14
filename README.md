@@ -7,7 +7,7 @@ This is a working example of a Docker working in KBC. Functionality is simple, s
 ```
 git clone https://github.com/keboola/docker-demo.git
 cd docker-demo
-sudo docker build -t keboola/docker-demo .
+sudo docker build -no-cache -t keboola/docker-demo .
 ```
 
 ## Runing a container
