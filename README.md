@@ -10,11 +10,11 @@ cd docker-demo
 docker build -t keboola/docker-demo .
 ```
 
-## Running
+## Runing a container
 
 ```
 docker run \
---volume=/Users/ondra/Coding/docker/data:/home/data \
+--volume=/Users/ondra/Coding/docker/data:/data \
 --memory=64m \
 --cpu-shares=1 \
 --rm \
@@ -24,7 +24,7 @@ keboola/docker-demo:latest
 Note: `--volume` needs to be adjusted accordingly.
 
 ## Sample configuration
-Mapped to `/home/data/config.yml` 
+Mapped to `/data/config.yml` 
 
 ```
 input:
@@ -42,7 +42,7 @@ string_length: 255
 ## Data sample
 
 ### Source
-Mapped to `/home/data/in/tables/in.c-main.data.csv`
+Mapped to `/data/in/tables/in.c-main.data.csv`
 
 ```
 id,text,some_other_column
@@ -51,7 +51,7 @@ id,text,some_other_column
 ```
 
 ### Destination
-Created in `/home/data/out/tables/out.c-main.data.csv`
+Created in `/data/out/tables/out.c-main.data.csv`
 
 
 ```
@@ -89,7 +89,7 @@ What happens before and after running a Docker container.
   - Create configurationi file
   - Run the container
   - Upload all tables and files in output mapping
-  - Delete image and all temporary files
+  - Delete the container and all temporary files
 
 
 ### Errors
@@ -98,16 +98,16 @@ The script defined in `ENTRYPOINT` or `CMD` can provide an exit status. Everythi
 
 ## Data & configuration injection
 
-Keboola Connection will inject configuration and (optionally) an input mapping in the Docker container in `/home/data` folder. 
+Keboola Connection will inject configuration and (optionally) an input mapping in the Docker container in `/data` folder. 
 
 
 ### Configuration
 
 The configuration file will be one of the following, depending on the settings.
 
- - `/home/data/config.yml`
- - `/home/data/config.json`
- - `/home/data/config.ini` 
+ - `/data/config.yml`
+ - `/data/config.json`
+ - `/data/config.ini` 
  
 The configuration file will contain all configuration settings (including input and output mapping even if the mapping is provided by Keboola Connection).
 
@@ -127,7 +127,7 @@ As a part of container configuration you can specify tables and files that will 
 
 #### Tables
 
-Tables from input mapping will are mounted to `/home/data/in/tables`, where file name equals to the table name with `.csv` suffix. 
+Tables from input mapping will are mounted to `/data/in/tables`, where file name equals to the table name with `.csv` suffix. 
 
 Input mapping parameters are similar to [Transfiormation API input mapping ](http://wiki.keboola.com/home/keboola-connection/devel-space/transformations/input-mapping). If `destination` is not set, the CSV file will have the same name as the table.
 
@@ -135,7 +135,7 @@ The tables element in configuration is an array.
 
 ##### Examples
 
-Download tables `in.c-ex-salesforce.Leads` and `in.c-ex-salesforce.Accounts` to `/home/data/tables/in/leads.csv` and `/home/data/tables/in/accounts.csv`
+Download tables `in.c-ex-salesforce.Leads` and `in.c-ex-salesforce.Accounts` to `/data/tables/in/leads.csv` and `/data/tables/in/accounts.csv`
 
 ```
 input:
@@ -150,7 +150,7 @@ input:
 ```
 
 
-Download 2 days of data from table `in.c-storage.StoredData` to `/home/data/tables/in/in.c-storage.StoredData.csv`
+Download 2 days of data from table `in.c-storage.StoredData` to `/data/tables/in/in.c-storage.StoredData.csv`
 
 ```
 input:
@@ -197,16 +197,16 @@ input:
       query: tags:"keboola/docker-demo"
 ```
 
-All files that will match the fulltext search will be downloaded to the `/home/data/in/files` folder. Each file will also contain a manifest with all information about the file in the chosen format.
+All files that will match the fulltext search will be downloaded to the `/data/in/files` folder. Each file will also contain a manifest with all information about the file in the chosen format.
 
 ```
-/home/data/in/files/75807542
-/home/data/in/files/75807542.manifest
-/home/data/in/files/75807657
-/home/data/in/files/75807657.manifest		
+/data/in/files/75807542
+/data/in/files/75807542.manifest
+/data/in/files/75807657
+/data/in/files/75807657.manifest		
 ```
 
-`/home/data/in/files/75807542.manifest`:
+`/data/in/files/75807542.manifest`:
 
 ```
   id: 75807657
@@ -232,11 +232,11 @@ Since you might be processing the same files over and over, if the image is set 
 
 Output mapping can be defined at multiple places - in configuration file or in manifests, for both tables and files.
 
-Basically manifests allow you to process files in `/home/data/out` folder without defining them in the output mapping. That allows for flexible and dynamic output mapping, where the structure is unknown at the beginning.
+Basically manifests allow you to process files in `/data/out` folder without defining them in the output mapping. That allows for flexible and dynamic output mapping, where the structure is unknown at the beginning.
 
 #### Tables
 
-In the simplest format, output mapping processes CSV files in the `/home/data/out/tables` folder and uploads them into tables. The name of the file may be equal to the name of the table.
+In the simplest format, output mapping processes CSV files in the `/data/out/tables` folder and uploads them into tables. The name of the file may be equal to the name of the table.
 
 Output mapping parameters are similar to [Transfiormation API output mapping ](http://wiki.keboola.com/home/keboola-connection/devel-space/transformations/intro#TOC-Output-mapping). If `source` is not set, the CSV file is expected to have the same name as the `destination` table.
 
@@ -244,7 +244,7 @@ The tables element in configuration is an array.
 
 ##### Examples
 
-Upload `/home/data/out/tables/out.c-main.data.csv` to `out.c-main.data`.
+Upload `/data/out/tables/out.c-main.data.csv` to `out.c-main.data`.
 
 ```
 output:
@@ -253,7 +253,7 @@ output:
       destination: out.c-main.data
 ```
 
-Upload `/home/data/out/tables/data.csv` to `out.c-main.data`.
+Upload `/data/out/tables/data.csv` to `out.c-main.data`.
 with a primary key and incrementally.
 
 ```
@@ -281,14 +281,14 @@ output:
 
 ##### Manifests
 
-To allow dynamic data outputs, that cannot be determined before running the container, each file in `/home/data/out` directory can contain a manifest with the output mapping settings in the chosen format.
+To allow dynamic data outputs, that cannot be determined before running the container, each file in `/data/out` directory can contain a manifest with the output mapping settings in the chosen format.
 
 ```
-/home/data/out/tables/table.csv
-/home/data/out/tables/table.csv.manifest
+/data/out/tables/table.csv
+/data/out/tables/table.csv.manifest
 ```
 
-`/home/data/out/table.csv.manifest`: 
+`/data/out/table.csv.manifest`: 
 
 ```
 destination: out.c-main.Leads
@@ -297,11 +297,11 @@ incremental: 1
 
 #### Files
 
-Output files from `/home/data/out/files` folder are automatically uploaded to file uploads. If the manifest file is defined, the information from the manifest file will be used. 
+Output files from `/data/out/files` folder are automatically uploaded to file uploads. If the manifest file is defined, the information from the manifest file will be used. 
 
 ```
-/home/data/out/files/image.jpg
-/home/data/out/files/image.jpg.manifest
+/data/out/files/image.jpg
+/data/out/files/image.jpg.manifest
 ```
 
 These manifest parameters can be used (taken from [Storage API File Import](http://docs.keboola.apiary.io/#files)):
@@ -316,7 +316,7 @@ These manifest parameters can be used (taken from [Storage API File Import](http
 
 #####Example
 
-`/home/data/out/files/image.jpg.manifest`: 
+`/data/out/files/image.jpg.manifest`: 
 
 ```
 name: image.jpg
