@@ -27,8 +27,6 @@ Note: `--volume` needs to be adjusted accordingly.
 Mapped to `/home/data/config.yml` 
 
 ```
-storage_api:
-  token: 123456
 input:
   tables:
     0:
@@ -77,7 +75,7 @@ Docker image must be able to run as executable, `Dockerfile` must contain `ENTRY
 
 To be defined further, but you will have options to set:
 
-  * format of injected config file (yml, json, ini, ENV variables)
+  * format of injected config file and manifests (YAML, JSON, INI)
   * container memory limit
   * whether or not the input and output mapping is provided by Keboola Connection
 
@@ -115,12 +113,12 @@ The configuration file will contain all configuration settings (including input 
 
 Configuration file will contain:
 
- - `storage_api.token` - Storage API token, that was used to run the Docker image in Keboola Connection
  - `input.tables` (optional) - array of input mappings (see further)
  - `input.files` (optional) - array of file upload queries (see futher)
  - `output.tables` (optional) - array of output mappings
  - `output.files` (optional) - array of files that will be uploaded to Storage API
  - all other configuration options defined for the container
+ - `storage_api.token` (optional) - if image has granted access to the token, it will be provided to the container
 
 
 ### Input Mapping
@@ -190,7 +188,45 @@ input:
 
 #### Files
 
-TBD, format for querying files.
+You can also download files from file uploads using a ES query.
+
+```
+input:
+  files:
+    0:
+      query: tags:"keboola/docker-demo"
+```
+
+All files that will match the fulltext search will be downloaded to the `/home/data/in/files` folder. Each file will also contain a manifest with all information about the file in the chosen format.
+
+```
+/home/data/in/files/75807542
+/home/data/in/files/75807542.manifest
+/home/data/in/files/75807657
+/home/data/in/files/75807657.manifest		
+```
+
+`/home/data/in/files/75807542.manifest`:
+
+```
+  id: 75807657
+  created: "2015-01-14T00:47:00+0100"
+  isPublic: false
+  isSliced: false
+  isEncrypted: false
+  name: "one_2015_01_05allkeys.json.zip"
+  sizeBytes: 563416
+  tags: 
+    - "keboola/docker-demo"
+  maxAgeDays: 180
+  creatorToken: 
+    id: 3800
+    description: "ondrej.hlavacek@keboola.com"
+```
+
+##### Incremental Processing
+
+Since you might be processing the same files over and over, if the image is set to work incrementally with files from file upload, upon each successful run of the container all files, that have been downloaded, will get tagged with `[IMAGE_ID]:processed` tag (eg. `keboola/docker-demo:processed`). These files will be automatically excluded from the next input mapping.
 
 ### Output Mapping
 
@@ -204,7 +240,7 @@ In the simplest format, output mapping processes CSV files in the `/home/data/ou
 
 Output mapping parameters are similar to [Transfiormation API output mapping ](http://wiki.keboola.com/home/keboola-connection/devel-space/transformations/intro#TOC-Output-mapping). If `source` is not set, the CSV file is expected to have the same name as the `destination` table.
 
-The tables element in configuration is an array.
+The tables element in configuration is an array. 
 
 ##### Examples
 
@@ -245,11 +281,11 @@ output:
 
 ##### Manifests
 
-To allow dynamic data outputs, that cannot be determined before running the container, each file in `/home/data/out` directory can contain a manifest with the output mapping settings in YAML format.
+To allow dynamic data outputs, that cannot be determined before running the container, each file in `/home/data/out` directory can contain a manifest with the output mapping settings in the chosen format.
 
 ```
-/home/data/out/table.csv
-/home/data/out/table.csv.manifest
+/home/data/out/tables/table.csv
+/home/data/out/tables/table.csv.manifest
 ```
 
 `/home/data/out/table.csv.manifest`: 
@@ -257,11 +293,37 @@ To allow dynamic data outputs, that cannot be determined before running the cont
 ```
 destination: out.c-main.Leads
 incremental: 1
-deleteWhereColumn: Status
-deleteWhereValues: ["Closed"]
-deleteWhereOperator: eq    
 ```
 
 #### Files
 
-TBD.
+Output files from `/home/data/out/files` folder are automatically uploaded to file uploads. If the manifest file is defined, the information from the manifest file will be used. 
+
+```
+/home/data/out/files/image.jpg
+/home/data/out/files/image.jpg.manifest
+```
+
+These manifest parameters can be used (taken from [Storage API File Import](http://docs.keboola.apiary.io/#files)):
+
+ - name (if not set, will use the filename)
+ - contentType 
+ - isPublic
+ - isPermanent
+ - notify
+ - tags
+ - isEncrypted
+
+#####Example
+
+`/home/data/out/files/image.jpg.manifest`: 
+
+```
+name: image.jpg
+contentType: image/jpeg
+isPublic: true
+isPermanent: true
+tags: 
+  - image
+  - pie-chart
+```
