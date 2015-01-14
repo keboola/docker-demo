@@ -7,14 +7,14 @@ This is a working example of a Docker working in KBC. Functionality is simple, s
 ```
 git clone https://github.com/keboola/docker-demo.git
 cd docker-demo
-docker build -t keboola/docker-demo .
+sudo docker build -t keboola/docker-demo .
 ```
 
 ## Runing a container
 
 ```
-docker run \
---volume=/Users/ondra/Coding/docker/data:/data \
+sudo docker run \
+--volume=/home/ec2-user/data:/data \
 --memory=64m \
 --cpu-shares=1 \
 --rm \
