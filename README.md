@@ -50,7 +50,7 @@ Mapped to `/data/in/tables/in.c-main.data.csv`
 
 ```
 id,text,some_other_column
-1,""Short text","Whatever"
+1,"Short text","Whatever"
 2,"Long text Long text Long text","Something else"
 ```
 
