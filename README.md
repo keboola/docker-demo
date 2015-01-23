@@ -107,6 +107,8 @@ Keboola Connection will inject configuration and (optionally) an input mapping i
 
 ### Configuration
 
+Note: all multiword parameter names are used with underscores instead of camel case.
+
 The configuration file will be one of the following, depending on the settings.
 
  - `/data/config.yml`
@@ -182,9 +184,9 @@ storage:
       0:
         source: in.c-ex-salesforce.Leads
         destination: closed_leads
-        whereColumn: Status
-        whereValues: ["Closed Won", "Closed Lost"]
-        whereOperator: eq
+        where_column: Status
+        where_values: ["Closed Won", "Closed Lost"]
+        where_operator: eq
       
 ```
 
@@ -218,15 +220,15 @@ All files that will match the fulltext search will be downloaded to the `/data/i
 ```
   id: 75807657
   created: "2015-01-14T00:47:00+0100"
-  isPublic: false
-  isSliced: false
-  isEncrypted: false
+  is_public: false
+  is_sliced: false
+  is_encrypted: false
   name: "one_2015_01_05allkeys.json.zip"
-  sizeBytes: 563416
+  size_bytes: 563416
   tags: 
     - "keboola/docker-demo"
-  maxAgeDays: 180
-  creatorToken: 
+  max_age_days: 180
+  creator_token: 
     id: 3800
     description: "ondrej.hlavacek@keboola.com"
 ```
@@ -272,7 +274,7 @@ storage:
         source: data
         destination: out.c-main.data
         incremental: 1
-        primaryKey: ["id"]
+        primary_key: ["id"]
 ```
 
 Delete data from `destination` table before uploading the CSV file (only makes sense with `incremental: 1`).
@@ -284,9 +286,9 @@ storage:
       0:
         destination: out.c-main.Leads
         incremental: 1
-        deleteWhereColumn: Status
-        deleteWhereValues: ["Closed"]
-        deleteWhereOperator: eq              
+        delete_where_column: Status
+        delete_where_values: ["Closed"]
+        delete_where_operator: eq              
 ```
 
 ##### Manifests
@@ -317,12 +319,12 @@ Output files from `/data/out/files` folder are automatically uploaded to file up
 These manifest parameters can be used (taken from [Storage API File Import](http://docs.keboola.apiary.io/#files)):
 
  - `name` (if not set, will use the filename)
- - `contentType`
- - `isPublic`
- - `isPermanent`
+ - `content_type`
+ - `is_public`
+ - `is_permanent`
  - `notify`
  - `tags`
- - `isEncrypted`
+ - `is_encrypted`
 
 #####Example
 
@@ -330,9 +332,9 @@ These manifest parameters can be used (taken from [Storage API File Import](http
 
 ```
 name: image.jpg
-contentType: image/jpeg
-isPublic: true
-isPermanent: true
+content_type: image/jpeg
+is_public: true
+is_permanent: true
 tags: 
   - image
   - pie-chart
