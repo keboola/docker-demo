@@ -131,7 +131,7 @@ As a part of container configuration you can specify tables and files that will 
 
 Tables from input mapping will are mounted to `/data/in/tables`, where file name equals to the table name with `.csv` suffix. 
 
-Input mapping parameters are similar to [Transfiormation API input mapping ](http://wiki.keboola.com/home/keboola-connection/devel-space/transformations/input-mapping). If `destination` is not set, the CSV file will have the same name as the table.
+Input mapping parameters are similar to [Storage API export table options ](http://docs.keboola.apiary.io/#tables). If `destination` is not set, the CSV file will have the same name as the table.
 
 The tables element in configuration is an array.
 
@@ -161,7 +161,7 @@ storage:
     tables:
       0:
         source: in.c-storage.StoredData
-        days: 2  
+        changed_since: -2 days  
 ```
 
 Download only certain columns
