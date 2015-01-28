@@ -13,7 +13,7 @@ if (!isset($arguments["data"])) {
 $config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
 
 $sourceTable = $config["storage"]["input"]["tables"][0]["source"];
-$destinationTable = "sliced.csv";
+$destinationFile = "sliced.csv";
 $primaryKeyColumn = $config["user"]["primary_key_column"];
 $dataColumn = $config["user"]["data_column"];
 $stringLength = $config["user"]["string_length"];
@@ -39,7 +39,7 @@ if (!file_exists($arguments["data"] . "/in/tables/{$sourceTable}.csv")) {
 }
 
 $fhIn = fopen($arguments["data"] . "/in/tables/{$sourceTable}.csv", "r");
-$fhOut = fopen($arguments["data"] . "/out/tables/{$destinationTable}.csv", "w");
+$fhOut = fopen($arguments["data"] . "/out/tables/{$destinationFile}", "w");
 
 $header = fgetcsv($fhIn);
 
