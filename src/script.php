@@ -12,11 +12,11 @@ if (!isset($arguments["data"])) {
 
 $config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
 
-$sourceTable = $config["input"]["tables"][0]["source"];
-$destinationTable = $config["output"]["tables"][0]["destination"];;
-$primaryKeyColumn = $config["primary_key_column"];
-$dataColumn = $config["data_column"];
-$stringLength = $config["string_length"];
+$sourceTable = $config["storage"]["input"]["tables"][0]["source"];
+$destinationTable = "sliced.csv";
+$primaryKeyColumn = $config["user"]["primary_key_column"];
+$dataColumn = $config["user"]["data_column"];
+$stringLength = $config["user"]["string_length"];
 
 $dataColumnIndex = 0;
 $primaryKeyColumnIndex = 0;

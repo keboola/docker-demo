@@ -1,3 +1,4 @@
+# VERSION 1.0.1
 FROM centos:centos6
 MAINTAINER Ondrej Hlavacek <ondrej.hlavacek@keboola.com>
 

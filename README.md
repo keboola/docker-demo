@@ -1,6 +1,6 @@
 # Keboola Docker Demo
 
-This is a working example of a Docker working in KBC. Functionality is simple, splits long text columns into multiple rows and adds index number into a new column.
+This is a working example of a Docker working in KBC. Functionality is simple, splits long text columns into multiple rows and adds index number into a new column and writes the result into `/data/out/tables/sliced.csv` file.
 
 ## Install & build
 
@@ -27,17 +27,20 @@ Note: `--volume` needs to be adjusted accordingly.
 Mapped to `/data/config.yml` 
 
 ```
-input:
-  tables:
-    0:
-      source: in.c-main.data
-output:
-  tables:
-    0:
-      destination: out.c-main.data
-primary_key_column: id
-data_column: text
-string_length: 255
+storage: 
+  input:
+    tables:
+      0:
+        source: in.c-main.data
+  output:
+    tables:
+      0:
+        source: sliced.csv
+        destination: out.c-main.data
+user:
+  primary_key_column: id
+  data_column: text
+  string_length: 255
 ```
 ## Data sample
 
