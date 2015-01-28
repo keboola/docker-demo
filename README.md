@@ -27,7 +27,9 @@ Note: `--volume` needs to be adjusted accordingly.
 Mapped to `/data/config.yml` 
 
 ```
-storage: 
+system:
+  image_tag: 0.6 # just an example, latest by default
+storage:
   input:
     tables:
       0:
@@ -37,7 +39,7 @@ storage:
       0:
         source: sliced.csv
         destination: out.c-main.data
-user:
+user: 
   primary_key_column: id
   data_column: text
   string_length: 255
@@ -49,7 +51,7 @@ Mapped to `/data/in/tables/in.c-main.data.csv`
 
 ```
 id,text,some_other_column
-1,""Short text","Whatever"
+1,"Short text","Whatever"
 2,"Long text Long text Long text","Something else"
 ```
 
@@ -97,7 +99,7 @@ What happens before and after running a Docker container.
 
 ### Errors
 
-The script defined in `ENTRYPOINT` or `CMD` can provide an exit status. Everything >0 is considered an error and then all content of `STDOUT` will be logged in the error detail.
+The script defined in `ENTRYPOINT` or `CMD` can provide an exit status. Everything >0 is considered an error and then all content of `STDOUT` will be logged in the error detail. Exit status = 1 will be considered as an user exception, all other as application exceptions.
 
 ## Data & configuration injection
 
@@ -105,6 +107,8 @@ Keboola Connection will inject configuration and (optionally) an input mapping i
 
 
 ### Configuration
+
+Note: all multiword parameter names are used with underscores instead of camel case.
 
 The configuration file will be one of the following, depending on the settings.
 
@@ -114,15 +118,11 @@ The configuration file will be one of the following, depending on the settings.
  
 The configuration file will contain all configuration settings (including input and output mapping even if the mapping is provided by Keboola Connection).
 
-Configuration file will contain:
+Configuration file may contain these sections:
 
- - `input.tables` (optional) - array of input mappings (see further)
- - `input.files` (optional) - array of file upload queries (see futher)
- - `output.tables` (optional) - array of output mappings
- - `output.files` (optional) - array of files that will be uploaded to Storage API
- - all other configuration options defined for the container
- - `storage_api.token` (optional) - if image has granted access to the token, it will be provided to the container
-
+ - `storage` - list of input and output mappings and Storage API token, if required
+ - `system` - copy of system configuration (eg. image tag)
+ - `user` - user variables
 
 ### Input Mapping
 
@@ -132,7 +132,7 @@ As a part of container configuration you can specify tables and files that will 
 
 Tables from input mapping will are mounted to `/data/in/tables`, where file name equals to the table name with `.csv` suffix. 
 
-Input mapping parameters are similar to [Transfiormation API input mapping ](http://wiki.keboola.com/home/keboola-connection/devel-space/transformations/input-mapping). If `destination` is not set, the CSV file will have the same name as the table.
+Input mapping parameters are similar to [Storage API export table options ](http://docs.keboola.apiary.io/#tables). If `destination` is not set, the CSV file will have the same name as the table.
 
 The tables element in configuration is an array.
 
@@ -141,14 +141,15 @@ The tables element in configuration is an array.
 Download tables `in.c-ex-salesforce.Leads` and `in.c-ex-salesforce.Accounts` to `/data/tables/in/leads.csv` and `/data/tables/in/accounts.csv`
 
 ```
-input:
-  tables:
-    0:
-      source: in.c-ex-salesforce.Leads
-      destination: leads
-    1:
-      source: in.c-ex-salesforce.Accounts
-      destination: accounts
+storage: 
+  input:
+    tables:
+      0:
+        source: in.c-ex-salesforce.Leads
+        destination: leads
+      1:
+        source: in.c-ex-salesforce.Accounts
+        destination: accounts
 
 ```
 
@@ -156,34 +157,37 @@ input:
 Download 2 days of data from table `in.c-storage.StoredData` to `/data/tables/in/in.c-storage.StoredData.csv`
 
 ```
-input:
-  tables:
-    0:
-      source: in.c-storage.StoredData
-      days: 2  
+storage: 
+  input:
+    tables:
+      0:
+        source: in.c-storage.StoredData
+        changed_since: -2 days  
 ```
 
 Download only certain columns
 
 ```
-input:
-  tables:
-    0:
-      source: in.c-ex-salesforce.Leads
-      columns: ["Id", "Revenue", "Date", "Status"]
+storage: 
+  input:
+    tables:
+      0:
+        source: in.c-ex-salesforce.Leads
+        columns: ["Id", "Revenue", "Date", "Status"]
 ```
 
 Download filtered table
 
 ```
-input:
-  tables:
-    0:
-      source: in.c-ex-salesforce.Leads
-      destination: closed_leads
-      whereColumn: Status
-      whereValues: ["Closed Won", "Closed Lost"]
-      whereOperator: eq
+storage: 
+  input:
+    tables:
+      0:
+        source: in.c-ex-salesforce.Leads
+        destination: closed_leads
+        where_column: Status
+        where_values: ["Closed Won", "Closed Lost"]
+        where_operator: eq
       
 ```
 
@@ -194,10 +198,13 @@ input:
 You can also download files from file uploads using a ES query.
 
 ```
-input:
-  files:
-    0:
-      query: tags:"keboola/docker-demo"
+storage: 
+  input:
+    files:
+      0:
+        tags:
+          - keboola/docker-demo
+        query: name:.zip
 ```
 
 All files that will match the fulltext search will be downloaded to the `/data/in/files` folder. Each file will also contain a manifest with all information about the file in the chosen format.
@@ -214,22 +221,22 @@ All files that will match the fulltext search will be downloaded to the `/data/i
 ```
   id: 75807657
   created: "2015-01-14T00:47:00+0100"
-  isPublic: false
-  isSliced: false
-  isEncrypted: false
+  is_public: false
+  is_sliced: false
+  is_encrypted: false
   name: "one_2015_01_05allkeys.json.zip"
-  sizeBytes: 563416
+  size_bytes: 563416
   tags: 
     - "keboola/docker-demo"
-  maxAgeDays: 180
-  creatorToken: 
+  max_age_days: 180
+  creator_token: 
     id: 3800
     description: "ondrej.hlavacek@keboola.com"
 ```
 
 ##### Incremental Processing
 
-Since you might be processing the same files over and over, if the image is set to work incrementally with files from file upload, upon each successful run of the container all files, that have been downloaded, will get tagged with `[IMAGE_ID]:processed` tag (eg. `keboola/docker-demo:processed`). These files will be automatically excluded from the next input mapping.
+Since you might be processing the same files over and over, if the image is set to work incrementally with files from file upload, upon each successful run of the container all files, that have been downloaded, will get tagged with `[COMPONENT_ID]/[CONFIGURATION_ID]:processed` tag (eg. `docker-demo/test-config:processed`). These files will be automatically excluded from the next input mapping.
 
 ### Output Mapping
 
@@ -250,36 +257,39 @@ The tables element in configuration is an array.
 Upload `/data/out/tables/out.c-main.data.csv` to `out.c-main.data`.
 
 ```
-output:
-  tables:
-    0:
-      destination: out.c-main.data
+storage: 
+  output:
+    tables:
+      0:
+        destination: out.c-main.data
 ```
 
 Upload `/data/out/tables/data.csv` to `out.c-main.data`.
 with a primary key and incrementally.
 
 ```
-output:
-  tables:
-    0:
-      source: data
-      destination: out.c-main.data
-      incremental: 1
-      primaryKey: ["id"]
+storage: 
+  output:
+    tables:
+      0:
+        source: data
+        destination: out.c-main.data
+        incremental: 1
+        primary_key: ["id"]
 ```
 
 Delete data from `destination` table before uploading the CSV file (only makes sense with `incremental: 1`).
 
 ```
-output:
-  tables:
-    0:
-      destination: out.c-main.Leads
-      incremental: 1
-      deleteWhereColumn: Status
-      deleteWhereValues: ["Closed"]
-      deleteWhereOperator: eq              
+storage: 
+  output:
+    tables:
+      0:
+        destination: out.c-main.Leads
+        incremental: 1
+        delete_where_column: Status
+        delete_where_values: ["Closed"]
+        delete_where_operator: eq              
 ```
 
 ##### Manifests
@@ -310,12 +320,12 @@ Output files from `/data/out/files` folder are automatically uploaded to file up
 These manifest parameters can be used (taken from [Storage API File Import](http://docs.keboola.apiary.io/#files)):
 
  - `name` (if not set, will use the filename)
- - `contentType`
- - `isPublic`
- - `isPermanent`
+ - `content_type`
+ - `is_public`
+ - `is_permanent`
  - `notify`
  - `tags`
- - `isEncrypted`
+ - `is_encrypted`
 
 #####Example
 
@@ -323,9 +333,9 @@ These manifest parameters can be used (taken from [Storage API File Import](http
 
 ```
 name: image.jpg
-contentType: image/jpeg
-isPublic: true
-isPermanent: true
+content_type: image/jpeg
+is_public: true
+is_permanent: true
 tags: 
   - image
   - pie-chart
