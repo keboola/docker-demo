@@ -14,9 +14,9 @@ $config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
 
 $sourceTable = $config["storage"]["input"]["tables"][0]["source"];
 $destinationFile = "sliced.csv";
-$primaryKeyColumn = $config["user"]["primary_key_column"];
-$dataColumn = $config["user"]["data_column"];
-$stringLength = $config["user"]["string_length"];
+$primaryKeyColumn = $config["parameters"]["primary_key_column"];
+$dataColumn = $config["parameters"]["data_column"];
+$stringLength = $config["parameters"]["string_length"];
 
 $dataColumnIndex = 0;
 $primaryKeyColumnIndex = 0;

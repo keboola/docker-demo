@@ -27,19 +27,18 @@ Note: `--volume` needs to be adjusted accordingly.
 Mapped to `/data/config.yml` 
 
 ```
-system:
-  image_tag: 0.6 # just an example, latest by default
 storage:
   input:
     tables:
       0:
         source: in.c-main.data
+        destination: source.csv
   output:
     tables:
       0:
         source: sliced.csv
         destination: out.c-main.data
-user: 
+parameters:
   primary_key_column: id
   data_column: text
   string_length: 255
@@ -47,7 +46,7 @@ user:
 ## Data sample
 
 ### Source
-Mapped to `/data/in/tables/in.c-main.data.csv`
+Mapped to `/data/in/tables/source.csv`
 
 ```
 id,text,some_other_column
@@ -56,7 +55,7 @@ id,text,some_other_column
 ```
 
 ### Destination
-Created in `/data/out/tables/out.c-main.data.csv`
+Created in `/data/out/tables/sliced.csv`
 
 
 ```
