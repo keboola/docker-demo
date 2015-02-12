@@ -1,4 +1,4 @@
-# VERSION 1.0.4
+# VERSION 1.0.5
 FROM keboola/base-php
 MAINTAINER Ondrej Hlavacek <ondrej.hlavacek@keboola.com>
 
