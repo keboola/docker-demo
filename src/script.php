@@ -12,7 +12,11 @@ if (!isset($arguments["data"])) {
 
 $config = Yaml::parse(file_get_contents($arguments["data"] . "/config.yml"));
 
-$sourceTable = $config["storage"]["input"]["tables"][0]["source"];
+if (isset($config["storage"]["input"]["tables"][0]["destination"])) {
+    $sourceTable = $config["storage"]["input"]["tables"][0]["destination"];
+} else {
+    $sourceTable = $config["storage"]["input"]["tables"][0]["source"];
+}
 $destinationFile = "sliced.csv";
 $primaryKeyColumn = $config["parameters"]["primary_key_column"];
 $dataColumn = $config["parameters"]["data_column"];
@@ -33,12 +37,12 @@ function mb_str_split($str, $l=0) {
     return preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY);
 }
 
-if (!file_exists($arguments["data"] . "/in/tables/{$sourceTable}.csv")) {
-	print "File 'data/in/tables/{$sourceTable}.csv' not found.";
+if (!file_exists($arguments["data"] . "/in/tables/{$sourceTable}")) {
+	print "File 'data/in/tables/{$sourceTable}' not found.";
 	exit(1);
 }
 
-$fhIn = fopen($arguments["data"] . "/in/tables/{$sourceTable}.csv", "r");
+$fhIn = fopen($arguments["data"] . "/in/tables/{$sourceTable}", "r");
 $fhOut = fopen($arguments["data"] . "/out/tables/{$destinationFile}", "w");
 
 $header = fgetcsv($fhIn);
