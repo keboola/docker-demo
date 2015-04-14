@@ -6,6 +6,6 @@ WORKDIR /home
 
 # Initialize 
 RUN git clone https://github.com/keboola/docker-demo.git ./
-RUN composer install
+RUN composer install --no-interaction
 
 ENTRYPOINT php ./src/script.php --data=/data
